@@ -2,18 +2,18 @@ const hre = require("hardhat");
 
 async function main() {
   
-  const NFT = await hre.ethers.getContractFactory("NFT");
-  const nft = await NFT.deploy();
+  //const NFT = await hre.ethers.getContractFactory("NFT");
+  //const nft = await NFT.deploy();
 
-  await nft.deployed();
+  //await nft.deployed();
   
-  //const Nerf = await hre.ethers.getContractFactory("Nerf");
-  //const nerf = await Nerf.deploy(process.env.TOKEN_ADDR, process.env.NFT_ADDR);
+  const Nerf = await hre.ethers.getContractFactory("Nerf");
+  const nerf = await Nerf.deploy(process.env.TOKEN_ADDR, process.env.NFT_ADDR);
 
-  //await nerf.deployed();
+  await nerf.deployed();
 
-  console.log("Nft deployed to:", nft.address);
-  //console.log("Nerf deployed to:", nerf.address);
+  //console.log("Nft deployed to:", nft.address);
+  console.log("Nerf deployed to:", nerf.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
