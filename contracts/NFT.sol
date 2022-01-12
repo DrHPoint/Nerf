@@ -31,3 +31,6 @@ contract NFT is ERC721, AccessControl {
         return super.supportsInterface(interfaceId);
     }
 }
+
+
+//Переделать под тот контракт, что наметил с нумерабл
