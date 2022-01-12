@@ -24,7 +24,7 @@ contract Nerf is AccessControl {
 
     modifier forFinishingAuction (uint256 _itemId) {
         require(auctions[_itemId].order.owner == msg.sender, "User has no rights to this token");
-        require(auctions[_itemId].timeThreshold >= block.timestamp, "Auction isnt over");
+        require(auctions[_itemId].timeThreshold <= block.timestamp, "Auction isnt over");
         require(auctions[_itemId].order.actual, "Auction already is over");
         _;
     }
@@ -38,6 +38,7 @@ contract Nerf is AccessControl {
     struct Auction {
         uint256 counter;
         uint256 timeThreshold;
+        uint256 step;
         Order order;
         address current;
     }
@@ -80,15 +81,17 @@ contract Nerf is AccessControl {
     function listItemOnAuction(uint256 _itemId, uint256 _price, uint256 _step) external {
         require(NFT(nftAddress).ownerOf(_itemId) == msg.sender, "User has no rights to this token");
         NFT(nftAddress).transferFrom(msg.sender, address(this), _itemId);
-        auctions[_itemId] = Auction(0, block.timestamp + duration, Order(_price, msg.sender, true), msg.sender);
+        auctions[_itemId] = Auction(0, block.timestamp + duration, _step, Order(_price, msg.sender, true), msg.sender);
         emit ListItemOnAuction(_itemId, msg.sender, _price, _step);
     }
 
     function makeBid(uint256 _itemId, uint256 _price) external {
         require(auctions[_itemId].order.actual, "Auction is over");
         require(auctions[_itemId].order.owner != msg.sender, "User has rights to this token");
+        require(auctions[_itemId].order.price + auctions[_itemId].step <= _price, "Bet less than the minimum raise");
         require(ERC20(tokenAddress).transferFrom(msg.sender, address(this), _price));
-        ERC20(tokenAddress).transfer(auctions[_itemId].current, auctions[_itemId].order.price);
+        if (auctions[_itemId].counter != 0)
+            ERC20(tokenAddress).transfer(auctions[_itemId].current, auctions[_itemId].order.price);
         auctions[_itemId].current = msg.sender;
         auctions[_itemId].order.price = _price;
         auctions[_itemId].counter++;
@@ -103,10 +106,15 @@ contract Nerf is AccessControl {
         emit FinishAuction(_itemId, auctions[_itemId].current, auctions[_itemId].order.price);
     }
 
-    function cancelAuction(uint256 _itemId) internal forFinishingAuction(_itemId) {
+    function cancelAuction(uint256 _itemId) external forFinishingAuction(_itemId) {
         auctions[_itemId].order.actual = false;
-        ERC20(tokenAddress).transfer(auctions[_itemId].current, auctions[_itemId].order.price);
+        if (auctions[_itemId].counter != 0)
+            ERC20(tokenAddress).transfer(auctions[_itemId].current, auctions[_itemId].order.price);
         NFT(nftAddress).safeTransferFrom(address(this), auctions[_itemId].order.owner, _itemId);
         emit CancelAuction(_itemId, msg.sender);
+    }
+
+    function getArtistRole(address _newArtist) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _grantRole(ARTIST_PERSON, _newArtist);
     }
 }

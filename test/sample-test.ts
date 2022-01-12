@@ -38,6 +38,8 @@ describe("Hermes", function () {
       const decimals = await token.decimals();
       const mint = await token.connect(owner).mint(addr2.address, parseUnits("100", decimals));
       await mint.wait();
+      const artist1 = await nerf.connect(owner).getArtistRole(addr1.address);
+      await artist1.wait();
       const createItem546 = await nerf.connect(addr1).createItem(546);
       await createItem546.wait();
       const getApprove1NFT = await nft.connect(addr1).approve(nerf.address, 546);
@@ -59,6 +61,8 @@ describe("Hermes", function () {
       const decimals = await token.decimals();
       const mint = await token.connect(owner).mint(addr2.address, parseUnits("100", decimals));
       await mint.wait();
+      const artist1 = await nerf.connect(owner).getArtistRole(addr1.address);
+      await artist1.wait();
       const createItem546 = await nerf.connect(addr1).createItem(546);
       await createItem546.wait();
       const getApprove1NFT = await nft.connect(addr1).approve(nerf.address, 546);
@@ -81,6 +85,8 @@ describe("Hermes", function () {
       const decimals = await token.decimals();
       const mint = await token.connect(owner).mint(addr2.address, parseUnits("100", decimals));
       await mint.wait();
+      const artist1 = await nerf.connect(owner).getArtistRole(addr1.address);
+      await artist1.wait();
       const createItem546 = await nerf.connect(addr1).createItem(546);
       await createItem546.wait();
       const getApprove1NFT = await nft.connect(addr1).approve(nerf.address, 546);
@@ -99,6 +105,8 @@ describe("Hermes", function () {
       const decimals = await token.decimals();
       const mint = await token.connect(owner).mint(addr2.address, parseUnits("100", decimals));
       await mint.wait();
+      const artist1 = await nerf.connect(owner).getArtistRole(addr1.address);
+      await artist1.wait();
       const createItem546 = await nerf.connect(addr1).createItem(546);
       await createItem546.wait();
       const getApprove1NFT = await nft.connect(addr1).approve(nerf.address, 546);
@@ -119,6 +127,8 @@ describe("Hermes", function () {
       const setMinterRole = await nft.connect(owner).setMinterRole(nerf.address);
       await setMinterRole.wait();
       const decimals = await token.decimals();
+      const artist1 = await nerf.connect(owner).getArtistRole(addr1.address);
+      await artist1.wait();
       const createItem546 = await nerf.connect(addr1).createItem(546);
       await createItem546.wait();
       const getApprove1NFT = await nft.connect(addr1).approve(nerf.address, 546);
@@ -139,6 +149,8 @@ describe("Hermes", function () {
       const decimals = await token.decimals();
       const mint = await token.connect(owner).mint(addr2.address, parseUnits("100", decimals));
       await mint.wait();
+      const artist1 = await nerf.connect(owner).getArtistRole(addr1.address);
+      await artist1.wait();
       const createItem546 = await nerf.connect(addr1).createItem(546);
       await createItem546.wait();
       const getApprove1NFT = await nft.connect(addr1).approve(nerf.address, 546);
@@ -151,6 +163,69 @@ describe("Hermes", function () {
       await tradeItem546.wait();
       await expect(nerf.connect(addr1).cancel(546)).to.be.revertedWith("Order isnt actual");
     });
+  });
+
+
+  describe("Item (second part)", () => {
+    it("Create Item and list on Auction", async () => {
+      await token.deployed();
+      await nft.deployed();
+      await nerf.deployed();
+      const setMinterRole = await nft.connect(owner).setMinterRole(nerf.address);
+      await setMinterRole.wait();
+      const decimals = await token.decimals();
+      const mint = await token.connect(owner).mint(addr2.address, parseUnits("200", decimals));
+      await mint.wait();
+      const mint3 = await token.connect(owner).mint(addr3.address, parseUnits("300", decimals));
+      await mint3.wait();
+      const artist1 = await nerf.connect(owner).getArtistRole(addr1.address);
+      await artist1.wait();
+      const createItem546 = await nerf.connect(addr1).createItem(546);
+      await createItem546.wait();
+      const getApprove1NFT = await nft.connect(addr1).approve(nerf.address, 546);
+      await getApprove1NFT.wait();
+      const listItem546 = await nerf.connect(addr1).listItemOnAuction(546, parseUnits("100", decimals), parseUnits("1", decimals));
+      await listItem546.wait();
+      const getApprove2Token = await token.connect(addr2).approve(nerf.address, parseUnits("101", decimals));
+      await getApprove2Token.wait();
+      const Bid546_2 = await nerf.connect(addr2).makeBid(546, parseUnits("101", decimals));
+      await Bid546_2.wait();
+      const getApprove3Token = await token.connect(addr3).approve(nerf.address, parseUnits("102", decimals));
+      await getApprove3Token.wait();
+      const Bid546_3 = await nerf.connect(addr3).makeBid(546, parseUnits("102", decimals));
+      await Bid546_3.wait();
+      await ethers.provider.send("evm_increaseTime", [3 * 86400]);
+      await ethers.provider.send("evm_mine", []);
+      const finish = await nerf.connect(addr1).finishAuction(546);
+      await finish.wait();
+
+    });
+
+    it("Create Item and list on Auction with cancel after 3 days", async () => {
+      await token.deployed();
+      await nft.deployed();
+      await nerf.deployed();
+      const setMinterRole = await nft.connect(owner).setMinterRole(nerf.address);
+      await setMinterRole.wait();
+      const decimals = await token.decimals();
+      const mint = await token.connect(owner).mint(addr2.address, parseUnits("200", decimals));
+      await mint.wait();
+      const mint3 = await token.connect(owner).mint(addr3.address, parseUnits("300", decimals));
+      await mint3.wait();
+      const artist1 = await nerf.connect(owner).getArtistRole(addr1.address);
+      await artist1.wait();
+      const createItem546 = await nerf.connect(addr1).createItem(546);
+      await createItem546.wait();
+      const getApprove1NFT = await nft.connect(addr1).approve(nerf.address, 546);
+      await getApprove1NFT.wait();
+      const listItem546 = await nerf.connect(addr1).listItemOnAuction(546, parseUnits("100", decimals), parseUnits("1", decimals));
+      await listItem546.wait();
+      await ethers.provider.send("evm_increaseTime", [3 * 86400]);
+      await ethers.provider.send("evm_mine", []);
+      const finish = await nerf.connect(addr1).cancelAuction(546);
+      await finish.wait();
+    });
+
   });
 
 });
