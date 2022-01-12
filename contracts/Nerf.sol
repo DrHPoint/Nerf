@@ -88,7 +88,7 @@ contract Nerf is AccessControl {
     function makeBid(uint256 _itemId, uint256 _price) external {
         require(auctions[_itemId].order.actual, "Auction is over");
         require(auctions[_itemId].order.owner != msg.sender, "User has rights to this token");
-        require(auctions[_itemId].order.price + auctions[_itemId].step <= _price, "Bet less than the minimum raise");
+        require(auctions[_itemId].order.price + auctions[_itemId].step <= _price, "Bid less than the minimum raise");
         require(ERC20(tokenAddress).transferFrom(msg.sender, address(this), _price));
         if (auctions[_itemId].counter != 0)
             ERC20(tokenAddress).transfer(auctions[_itemId].current, auctions[_itemId].order.price);
