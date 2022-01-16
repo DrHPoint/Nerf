@@ -50,8 +50,9 @@ contract Nerf is AccessControl {
     event NewBid(uint256 _itemId, address _bidderAddress, uint256 _bid);
     event FinishAuction(uint256 _itemId, address _newOwner, uint256 _finishPrice);
     event CancelAuction(uint256 _itemId, address _itemOwner);
+    event NewPrimeTime(uint256 _time);
 
-    function createItem(uint256 _itemId) external onlyRole(ARTIST_PERSON){ 
+    function createItem(uint256 _itemId) external onlyRole(ARTIST_PERSON) { 
         NFT(nftAddress).mint(msg.sender, _itemId);
     }
 
@@ -114,7 +115,11 @@ contract Nerf is AccessControl {
         emit CancelAuction(_itemId, msg.sender);
     }
 
-    function getArtistRole(address _newArtist) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setArtistRole(address _newArtist) external onlyRole(DEFAULT_ADMIN_ROLE) {
         _grantRole(ARTIST_PERSON, _newArtist);
+    }
+
+    function setPrimeTime(uint256 _time) external onlyRole(DEFAULT_ADMIN_ROLE) { 
+        duration = _time * 1 days;
     }
 }
