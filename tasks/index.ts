@@ -1,5 +1,5 @@
 import "./setMinterRole";
-import "./createToken";
+import "./createItem";
 import "./listitem";
 import "./buyitem";
 import "./cancel";

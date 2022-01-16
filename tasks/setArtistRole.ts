@@ -7,7 +7,7 @@ task("setartist", "Get artist role in Nerf", async (args, hre) => {
   const [addr1, addr2, ...addrs] = await hre.ethers.getSigners();
 
   const nerf = await hre.ethers.getContractAt("Nerf", process.env.NERF_ADDR as string);
-  await nerf.connect(addr1).setMinterRole(addr1.address);
+  await nerf.connect(addr1).setArtistRole(addr1.address);
 
   console.log('setartist task Done!'); 
 });
