@@ -5,8 +5,9 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./NFT.sol";
 import "./ERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
-contract Nerf is AccessControl {
+contract Nerf is AccessControl, ERC721Holder {
     
     uint256 private duration = 3 days;
     bytes32 public constant ARTIST_PERSON = keccak256("ARTIST_PERSON");
@@ -58,7 +59,7 @@ contract Nerf is AccessControl {
 
     function listItem(uint256 _itemId, uint256 _price) external { 
         require(NFT(nftAddress).ownerOf(_itemId) == msg.sender, "User has no rights to this token");
-        NFT(nftAddress).transferFrom(msg.sender, address(this), _itemId);
+        NFT(nftAddress).safeTransferFrom(msg.sender, address(this), _itemId);
         orders[_itemId] = Order(_price, msg.sender, true);
         emit ListItem(_itemId, msg.sender, _price);
     }
@@ -81,7 +82,7 @@ contract Nerf is AccessControl {
 
     function listItemOnAuction(uint256 _itemId, uint256 _price, uint256 _step) external {
         require(NFT(nftAddress).ownerOf(_itemId) == msg.sender, "User has no rights to this token");
-        NFT(nftAddress).transferFrom(msg.sender, address(this), _itemId);
+        NFT(nftAddress).safeTransferFrom(msg.sender, address(this), _itemId);
         auctions[_itemId] = Auction(0, block.timestamp + duration, _step, Order(_price, msg.sender, true), msg.sender);
         emit ListItemOnAuction(_itemId, msg.sender, _price, _step);
     }
